@@ -1,12 +1,12 @@
 <?php
-// Database connection
-$host = 'localhost'; // Your database host, often localhost
-$user = 'root'; // Your MySQL username
-$password = ''; // Your MySQL password
-$dbname = 'todo_db'; // The database name
+// MySQL database connection
+$servername = "localhost";
+$username = "todo_user"; 
+$password = "123456"; 
+$dbname = "todo_list"; 
 
 // Create connection
-$conn = new mysqli($host, $user, $password, $dbname);
+$conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $task = $conn->real_escape_string($_POST['task']); // Sanitize input
 
         // Insert the new task into the database
-        $sql = "INSERT INTO tasks (task) VALUES ('$task')";
+        $sql = "INSERT INTO tasks (task_name) VALUES ('$task')";
         if ($conn->query($sql) === TRUE) {
             // Redirect to the same page after adding the task
             header("Location: " . $_SERVER['PHP_SELF']);
@@ -30,9 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Remove a task
+// Delete a task
 if (isset($_GET['delete'])) {
-    $taskId = $_GET['delete'];
+    $taskId = (int)$_GET['delete'];
 
     // Delete the task from the database
     $sql = "DELETE FROM tasks WHERE id = $taskId";
@@ -76,7 +76,7 @@ $conn->close();
             width: 60%;
             margin: 50px auto;
             padding: 20px;
-            background-color: #ffffff; /* White background for container */
+            background-color: #ffffff;
             border-radius: 10px;
             box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
             text-align: center;
@@ -122,11 +122,6 @@ $conn->close();
             justify-content: space-between;
             align-items: center;
         }
-        li.completed {
-            background-color: #2ecc71;
-            color: white;
-            text-decoration: line-through;
-        }
         li button {
             background-color: #e74c3c;
             font-size: 16px;
@@ -135,13 +130,6 @@ $conn->close();
         }
         li button:hover {
             background-color: #c0392b;
-        }
-        .message {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #2ecc71;
-            color: white;
-            border-radius: 5px;
         }
     </style>
 </head>
@@ -155,14 +143,10 @@ $conn->close();
         <button type="submit">Add Task</button>
     </form>
 
-    <?php if ($_SERVER['REQUEST_METHOD'] == 'POST'): ?>
-        <div class="message">Task added successfully!</div>
-    <?php endif; ?>
-
     <ul>
-        <?php foreach ($tasks as $task): ?>
+        <?php foreach ($tasks as $index => $task): ?>
             <li>
-                <span><?= htmlspecialchars($task['task']) ?></span>
+                <span><?= htmlspecialchars($task['task_name']) ?></span>
                 <a href="?delete=<?= $task['id'] ?>" style="color: white; text-decoration: none;">
                     <button>Delete</button>
                 </a>
